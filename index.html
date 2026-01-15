@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>XD Store</title>
+  <link rel="icon" type="image/png" href="xd.png">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-image: url("fundo.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background: rgba(0,0,0,0.7);
+      min-height: 100vh;
+      padding: 30px;
+      text-align: center;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    nav li {
+      display: inline-block;
+      margin: 0 10px;
+    }
+
+    .menu-btn {
+      background: #6a0dad;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .menu-btn:hover {
+      background: #8a2be2;
+    }
+
+    /* --- ESTILO DO CARRINHO LATERAL --- */
+    .carrinho-sidebar {
+      position: fixed;
+      top: 0;
+      right: -320px; 
+      width: 300px;
+      height: 100%;
+      background: #111;
+      border-left: 3px solid #6a0dad;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+      transition: 0.4s ease;
+      z-index: 9999;
+      padding: 20px;
+      text-align: left;
+    }
+
+    .carrinho-sidebar.active {
+      right: 0;
+    }
+
+    .carrinho-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .close-cart {
+      cursor: pointer;
+      font-size: 24px;
+      color: #ff4444;
+      font-weight: bold;
+    }
+
+    .total-area {
+      margin-top: 30px;
+      border-top: 1px solid #333;
+      padding-top: 15px;
+    }
+
+    .finalizar-btn {
+      display: block;
+      width: 100%;
+      background: #00ff88;
+      color: black;
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    /* Botão de remover item individual */
+    .remover-item {
+      color: #ff4444;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: auto;
+      font-size: 1.2em;
+    }
+
+    /* --- POP-UP DE SUCESSO --- */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 10000;
+      display: none;
+    }
+
+    .popup-mensagem {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a1a1a;
+      border: 2px solid #6a0dad;
+      padding: 30px;
+      border-radius: 15px;
+      z-index: 10001;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(106, 13, 173, 0.5);
+      display: none;
+      min-width: 280px;
+    }
+
+    .popup-mensagem h2 { color: #00ff88; margin: 0 0 10px 0; }
+
+    /* --- PRODUTOS --- */
+    .search-box {
+      margin: 25px 0;
+      display: none;
+    }
+
+    .search-box input {
+      width: 300px;
+      max-width: 90%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    .produtos {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .produto {
+      background: #111;
+      border-radius: 12px;
+      width: 260px;
+      padding: 15px;
+      margin: 15px;
+      text-align: left;
+      border: 2px solid #6a0dad; 
+      transition: 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .produto:hover {
+      border-color: #8a2be2;
+      transform: translateY(-5px);
+    }
+
+    .produto img {
+      width: 100%;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .produto h3 { margin: 15px 0 5px; }
+    .preco-normal { font-size: 1.05em; font-weight: bold; }
+    .pix-desconto { margin-top: 6px; font-size: 0.85em; color: #00ff88; }
+    .pix-valor { font-size: 1em; font-weight: bold; color: #ffd700; margin-bottom: 15px; }
+
+    .detalhes-btn {
+      display: block;
+      margin-top: 12px;
+      padding: 10px;
+      background: #6a0dad;
+      color: white;
+      text-align: center;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+
+    .detalhes-btn:hover { background: #8a2be2; }
+
+    footer {
+      margin-top: 60px;
+      font-size: 0.9em;
+      color: #ccc;
+      padding-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+<div class="popup-mensagem" id="popup">
+  <h2>Sucesso!</h2>
+  <p>Seu produto está no seu carrinho.</p>
+  <button class="menu-btn" onclick="fecharPopUp()">Ok, entendi!</button>
+</div>
+
+<div class="carrinho-sidebar" id="carrinhoSidebar">
+  <div class="carrinho-header">
+    <h2 style="margin:0; font-size: 1.2em;">🛒 Meu Carrinho</h2>
+    <span class="close-cart" onclick="toggleCarrinho()">×</span>
+  </div>
+  
+  <div id="itensCarrinho">
+    <p style="color: #888; text-align: center; margin-top: 20px;">Seu carrinho está vazio.</p>
+  </div>
+
+  <div class="total-area">
+    <div style="display: flex; justify-content: space-between; font-weight: bold;">
+      <span>Total:</span>
+      <span id="valorTotal">R$ 0,00</span>
+    </div>
+    <a href="finalizar.html" class="finalizar-btn" onclick="validarFinalizar(event)">FINALIZAR COMPRA</a>
+  </div>
+</div>
+
+<div class="container">
+  <a class="menu-btn" href="https://discord.gg/3t7g9TbN5M">Suporte</a>
+  <h1>XD STORE</h1>
+
+  <nav>
+    <ul>
+      <li><span class="menu-btn" onclick="togglePesquisa()">Pesquisar produto</span></li>
+      <li><span class="menu-btn" onclick="toggleCarrinho()">Carrinho</span></li>
+      <li>
+  <a href="login.html" class="menu-btn">Entrar</a>
+</li>
+    </ul>
+  </nav>
+
+  <div class="search-box" id="searchBox">
+    <input type="text" id="pesquisa" placeholder="Digite o nome do produto..." onkeyup="filtrarProdutos()">
+  </div>
+
+  <div class="produtos">
+
+    <div class="produto" data-nome="minecraft fa">
+      <img src="produto1.jpg">
+      <h3>Minecraft FA</h3>
+      <div class="preco-normal">Preço: R$ 90,00</div>
+      <div class="pix-desconto">💸 Somente PIX</div>
+      <div class="pix-valor">À vista no PIX: R$ 70,00</div>
+      <a href="produto1.html" class="detalhes-btn">Ver detalhes</a>
+      <button class="menu-btn" style="margin-top:12px; background:#00aa66; width:100%;" 
+              onclick="adicionarAoCarrinho('Minecraft FA', 70, 'produto1.jpg')">
+        Adicionar ao Carrinho
+      </button>
+    </div>
+
+    <div class="produto" data-nome="minecraft sfa">
+      <img src="produto2.jpg">
+      <h3>Minecraft SFA</h3>
+      <div class="preco-normal">Preço: R$ 5,00</div>
+      <div class="pix-desconto">💸 Somente PIX</div>
+      <div class="pix-valor">À vista no PIX: R$ 2,50</div>
+      <a href="produto2.html" class="detalhes-btn">Ver detalhes</a>
+      <button class="menu-btn" style="margin-top:12px; background:#00aa66; width:100%;" 
+              onclick="adicionarAoCarrinho('Minecraft SFA', 2.50, 'produto2.jpg')">
+        Adicionar ao Carrinho
+      </button>
+    </div>
+
+    <div class="produto" data-nome="conta com Capa">
+      <img src="produto3.jpg">
+      <h3>Conta com Capa</h3>
+      <div class="preco-normal">Preço: R$ 140,00</div>
+      <div class="pix-desconto">💸 Somente PIX</div>
+      <div class="pix-valor">À vista no PIX: R$ 90,00</div>
+      <a href="produto3.html" class="detalhes-btn">Ver detalhes</a>
+      <button class="menu-btn" style="margin-top:12px; background:#00aa66; width:100%;" 
+              onclick="adicionarAoCarrinho('Conta com Capa', 90, 'produto3.jpg')">
+        Adicionar ao Carrinho
+      </button>
+    </div>
+
+    <div class="produto" data-nome="capa optifine">
+      <img src="produto4.jpg">
+      <h3>Capa Optifine</h3>
+      <div class="preco-normal">Preço: R$ 10,00</div>
+      <div class="pix-desconto">💸 Somente PIX</div>
+      <div class="pix-valor">À vista no PIX: R$ 5,00</div>
+      <a href="produto4.html" class="detalhes-btn">Ver detalhes</a>
+      <button class="menu-btn" style="margin-top:12px; background:#00aa66; width:100%;" 
+              onclick="adicionarAoCarrinho('Capa Optifine', 5, 'produto4.jpg')">
+        Adicionar ao Carrinho
+      </button>
+    </div>
+
+    <div class="produto" data-nome="capa of fa">
+      <img src="produto5.jpg">
+      <h3>Capa OF FA</h3>
+      <div class="preco-normal">Preço: R$ 50,00</div>
+      <div class="pix-desconto">💸 Somente PIX</div>
+      <div class="pix-valor">À vista no PIX: R$ 25,00</div>
+      <a href="produto5.html" class="detalhes-btn">Ver detalhes</a>
+      <button class="menu-btn" style="margin-top:12px; background:#00aa66; width:100%;" 
+              onclick="adicionarAoCarrinho('Capa OF FA', 25, 'produto5.jpg')">
+        Adicionar ao Carrinho
+      </button>
+    </div>
+
+  </div>
+
+  <footer>
+    <div>© 2026 XD Store. Todos os direitos reservados.</div>
+    <div>Powered by Ereemby</div>
+  </footer>
+</div>
+
+<script>
+// ────────────────────────────────────────────────
+// CARRINHO MULTI-ITENS + correção para persistir no reload
+// ────────────────────────────────────────────────
+
+function togglePesquisa() {
+  const box = document.getElementById("searchBox");
+  box.style.display = box.style.display === "block" ? "none" : "block";
+}
+
+function toggleCarrinho() {
+  const carrinho = document.getElementById("carrinhoSidebar");
+  carrinho.classList.toggle("active");
+}
+
+function fecharPopUp() {
+  document.getElementById("popup").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
+}
+
+function validarFinalizar(event) {
+  const carrinhoStr = localStorage.getItem("carrinho");
+  if (!carrinhoStr || JSON.parse(carrinhoStr).length === 0) {
+    event.preventDefault();
+    alert("Seu carrinho está vazio. Que tal dar uma olhada nos produtos?");
+  }
+}
+
+// Adicionar produto ao carrinho
+function adicionarAoCarrinho(nome, preco, img) {
+  let carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
+
+  const existeIndex = carrinho.findIndex(item => item.nome === nome);
+
+  if (existeIndex !== -1) {
+    carrinho[existeIndex].qtd += 1;
+  } else {
+    carrinho.push({
+      nome: nome,
+      preco: Number(preco),
+      img: img,
+      qtd: 1
+    });
+  }
+
+  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+  atualizarCarrinhoVisual();
+
+  // Mostra popup
+  document.getElementById("popup").style.display = "block";
+  document.getElementById("overlay").style.display = "block";
+
+ // Em vez de toggleCarrinho();
+if (!document.getElementById("carrinhoSidebar").classList.contains("active")) {
+  toggleCarrinho();  // só abre se estiver fechado
+}
+}
+
+// Remove item específico
+function removerItem(nome) {
+  let carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
+  carrinho = carrinho.filter(item => item.nome !== nome);
+  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+  atualizarCarrinhoVisual();
+}
+
+// Atualiza visual do carrinho
+function atualizarCarrinhoVisual() {
+  const lista = document.getElementById("itensCarrinho");
+  const valorTotalEl = document.getElementById("valorTotal");
+
+  let carrinho = [];
+  try {
+    const saved = localStorage.getItem("carrinho");
+    if (saved) {
+      carrinho = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error("Erro ao ler carrinho do localStorage:", e);
+    localStorage.removeItem("carrinho"); // limpa se corrompido
+  }
+
+  if (!Array.isArray(carrinho) || carrinho.length === 0) {
+    lista.innerHTML = `<p style="color: #888; text-align: center; margin-top: 20px;">Seu carrinho está vazio.</p>`;
+    valorTotalEl.innerText = "R$ 0,00";
+    return;
+  }
+
+  let html = "";
+  let totalGeral = 0;
+
+  carrinho.forEach(item => {
+    const subtotal = item.preco * item.qtd;
+    totalGeral += subtotal;
+
+    html += `
+      <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; background: #222; padding: 10px; border-radius: 8px; border-left: 4px solid #6a0dad;">
+        <img src="${item.img}" style="width: 50px; border-radius: 5px; object-fit: cover;">
+        <div style="flex: 1;">
+          <div style="font-weight: bold; font-size: 0.95em;">${item.nome}</div>
+          <div style="color: #ffd700; font-size: 0.85em;">
+            Qtd: ${item.qtd} × R$ ${item.preco.toFixed(2)} = R$ ${subtotal.toFixed(2)}
+          </div>
+        </div>
+        <span class="remover-item" onclick="removerItem('${item.nome.replace(/'/g, "\\'")}')">×</span>
+      </div>
+    `;
+  });
+
+  lista.innerHTML = html;
+  valorTotalEl.innerText = `R$ ${totalGeral.toFixed(2)}`;
+}
+
+// Processa adição vinda das páginas de produto detalhado
+function processarAdicaoDeProdutoDetalhado() {
+  const produtoTemp = localStorage.getItem("produtoTempAdicionar");
+  if (!produtoTemp) return;
+
+  try {
+    const prod = JSON.parse(produtoTemp);
+    let carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
+
+    const existeIndex = carrinho.findIndex(item => item.nome === prod.nome);
+
+    if (existeIndex !== -1) {
+      carrinho[existeIndex].qtd += prod.qtd;
+    } else {
+      carrinho.push({
+        nome: prod.nome,
+        preco: Number(prod.preco),
+        img: prod.img,
+        qtd: prod.qtd
+      });
+    }
+
+    localStorage.setItem("carrinho", JSON.stringify(carrinho));
+    localStorage.removeItem("produtoTempAdicionar");
+
+    atualizarCarrinhoVisual();
+
+    // Mostra popup se veio de "adicionar ao carrinho"
+    if (localStorage.getItem("exibirPopUp") === "true") {
+      document.getElementById("popup").style.display = "block";
+      document.getElementById("overlay").style.display = "block";
+      localStorage.removeItem("exibirPopUp");
+    }
+  } catch (e) {
+    console.error("Erro ao processar produto temporário:", e);
+    localStorage.removeItem("produtoTempAdicionar");
+  }
+}
+
+// Inicialização
+window.onload = function() {
+  atualizarCarrinhoVisual();
+  processarAdicaoDeProdutoDetalhado();  // ← importante para vir de páginas de produto
+
+  // Caso ainda use a flag antiga em algum lugar (opcional)
+  if (localStorage.getItem("exibirPopUp") === "true") {
+    document.getElementById("popup").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+    localStorage.removeItem("exibirPopUp");
+  }
+};
+
+// Filtro de produtos
+function filtrarProdutos() {
+  const texto = document.getElementById("pesquisa").value.toLowerCase();
+  document.querySelectorAll(".produto").forEach(produto => {
+    const nome = produto.dataset.nome?.toLowerCase() || "";
+    produto.style.display = nome.includes(texto) ? "flex" : "none";
+  });
+}
+</script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBNEFlvTZ4qefCSZ2cci6f8QI1pNyT3p9w",
+    authDomain: "xd-store-a4815.firebaseapp.com",
+    projectId: "xd-store-a4815",
+    storageBucket: "xd-store-a4815.firebasestorage.app",
+    messagingSenderId: "467090694584",
+    appId: "1:467090694584:web:0a3b71f719c096fdeeaf4d",
+    measurementId: "G-KF0JTWYH5Y"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+</body>
+</html>
