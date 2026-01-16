@@ -21,13 +21,7 @@ body {
   padding: 30px;
   border-radius: 14px;
   width: 320px;
-
-  border: 2px solid #6a0dad;
-  box-shadow:
-    0 0 10px rgba(106, 13, 173, 0.5),
-    0 0 25px rgba(106, 13, 173, 0.3);
 }
-
 
 h2 {
   text-align: center;
@@ -41,12 +35,6 @@ input {
   border-radius: 8px;
   border: none;
   outline: none;
-  background: #1f1f1f;
-  color: white;
-}
-
-input::placeholder {
-  color: #aaa;
 }
 
 button {
@@ -63,74 +51,27 @@ button {
   color: black;
 }
 
-.btn-main:hover {
-  background: #00cc6a;
-}
-
 .social {
-  margin-top: 18px;
+  margin-top: 15px;
 }
 
 .social button {
   margin-top: 8px;
+  background: #1f1f1f;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  font-weight: bold;
-  cursor: not-allowed;
-  opacity: 0.85;
-}
-
-/* ===== BOTÕES VISUAIS ===== */
-.google {
-  background: #ffcfcf;
-  color: #000;
-}
-
-.discord {
-  background: #5865F2;
-}
-
-.social img {
-  width: 18px;
-  height: 18px;
-}
-
-.divider {
-  margin: 18px 0;
-  text-align: center;
-  font-size: 13px;
-  color: #777;
+  gap: 8px;
 }
 
 .toggle {
   text-align: center;
-  margin-top: 18px;
+  margin-top: 15px;
   cursor: pointer;
   color: #00ff88;
   font-size: 14px;
 }
-/* ===== BOTÕES SOCIAIS CORRIGIDOS ===== */
-.google {
-  background: #ff00c8;
-  color: #000000;
-}
-
-.google img {
-  filter: none;
-}
-
-.discord {
-  background: #5865F2;
-  color: #ffffff;
-}
-
-.discord img {
-  filter: brightness(0) invert(1);
-}
-
 </style>
 </head>
 
@@ -145,18 +86,9 @@ button {
 
 <button class="btn-main" onclick="submitForm()">Continuar</button>
 
-<div class="divider">ou continue com</div>
-
 <div class="social">
-  <button class="google" disabled>
-    <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png">
-    Entrar com Google
-  </button>
-
-  <button class="discord" disabled>
-    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png">
-    Entrar com Discord
-  </button>
+  <button disabled>Entrar com Google</button>
+  <button disabled>Entrar com Discord</button>
 </div>
 
 <div class="toggle" onclick="toggleMode()">
@@ -199,35 +131,17 @@ function submitForm() {
     toggleMode();
 
   } else {
-  if (!users[email] || users[email].password !== password) {
-    alert("Email ou senha inválidos");
-    return;
-  }
-
-  // salva dados do usuário logado
-  localStorage.setItem("loggedUserData", JSON.stringify({
-    email: email,
-    nickname: email.split("@")[0],
-    avatar: ""
-  }));
-
-  alert("Login realizado!");
-
-  // redireciona para a loja
-  window.location.href = "index.html";
-}
-
+    if (!users[email] || users[email].password !== password) {
+      alert("Email ou senha inválidos");
+      return;
+    }
 
     localStorage.setItem("loggedUser", email);
     alert("Login realizado!");
     // window.location.href = "index.html";
   }
-;
-
-window.location.href = "index.html";
-
+}
 </script>
-
 
 </body>
 </html>

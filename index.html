@@ -4,8 +4,63 @@
   <meta charset="UTF-8">
   <title>XD Store</title>
   <link rel="icon" type="image/png" href="xd.png">
+<div id="userStatus" style="position: fixed; top: 20px; right: 20px;"></div>
 
+  
   <style>
+    .user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  margin-right: 8px;
+  border: 2px solid #00ff88;
+}
+
+    /* ───── BOTÃO SUPORTE EXPANSÍVEL ───── */
+.suporte-btn {
+  position: fixed;
+  top: 25px;
+  left: 25px;
+  height: 48px;
+  width: 48px;
+  background: #5865F2;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: width 0.35s ease;
+  box-shadow: 0 0 15px rgba(88,101,242,0.6);
+  z-index: 9999;
+}
+
+.suporte-btn img {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.suporte-btn span {
+  color: white;
+  font-weight: bold;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Hover: expande */
+.suporte-btn:hover {
+  width: 160px;
+}
+
+.suporte-btn:hover span {
+  opacity: 1;
+}
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -217,6 +272,64 @@
     }
   </style>
 </head>
+<script>
+if (user) {
+  btn.innerHTML = "Olá, " + user.nome;
+  btn.onclick = () => {
+    if (confirm("Deseja sair da conta?")) {
+      logout();
+      location.reload();
+    }
+  };
+} else {
+  btn.innerHTML = "Entrar";
+  btn.onclick = () => window.location.href = "login.html";
+}
+</script>
+<script>
+
+
+const loggedUser = JSON.parse(localStorage.getItem("loggedUserData"));
+
+if (loggedUser) {
+  btnLogin.innerHTML = `
+    <img src="${loggedUser.avatar || 'default-avatar.png'}" class="user-avatar">
+    ${loggedUser.nickname || loggedUser.email}
+  `;
+  btnLogin.onclick = () => {
+    window.location.href = "perfil.html";
+  };
+} else {
+  btnLogin.innerText = "Entrar";
+  btnLogin.onclick = () => {
+    window.location.href = "login.html";
+  };
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const btnLogin = document.getElementById("btnLogin");
+  const user = JSON.parse(localStorage.getItem("loggedUserData"));
+
+  if (!btnLogin) return;
+
+  if (user) {
+    btnLogin.innerHTML = `
+      <img src="${user.avatar || 'default-avatar.png'}" class="user-avatar">
+      ${user.nickname || user.email}
+    `;
+    btnLogin.onclick = () => {
+      window.location.href = "perfil.html";
+    };
+  } else {
+    btnLogin.innerText = "Entrar";
+    btnLogin.onclick = () => {
+      window.location.href = "login.html";
+    };
+  }
+});
+</script>
+
 <body>
 
 <div class="overlay" id="overlay"></div>
@@ -246,7 +359,11 @@
 </div>
 
 <div class="container">
-  <a class="menu-btn" href="https://discord.gg/3t7g9TbN5M">Suporte</a>
+<a href="https://discord.gg/3t7g9TbN5M" class="suporte-btn" target="_blank">
+  <img src="discord.png" alt="Discord">
+  <span>Suporte</span>
+</a>
+
   <h1>XD STORE</h1>
 
   <nav>
@@ -254,7 +371,10 @@
       <li><span class="menu-btn" onclick="togglePesquisa()">Pesquisar produto</span></li>
       <li><span class="menu-btn" onclick="toggleCarrinho()">Carrinho</span></li>
       <li>
-  <a href="login.html" class="menu-btn">Entrar</a>
+  <li>
+  <button class="menu-btn" id="btnLogin">Entrar</button>
+</li>
+
 </li>
     </ul>
   </nav>
@@ -534,6 +654,8 @@ function filtrarProdutos() {
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
+
+
 </script>
 
 </body>
